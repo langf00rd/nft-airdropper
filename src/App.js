@@ -10,6 +10,7 @@ import {
 
 function App() {
   const [address, setAddress] = useState('');
+  const [wallet, setWallet] = useState();
   const [token, setToken] = useState({ name: '', symbol: '' })
   const [loading, setLoading] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -29,11 +30,11 @@ function App() {
   const connectWallet = async () => {
     try {
       setLoading(true)
-      await window.ethereum.request({
+      let _wallet = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
 
-      // setWallet(_wallet[0]);
+      setWallet(_wallet[0]);
       // check if user is owner
       // if (!await isOwner(_wallet[0])) {
       //   setConnected(false)
@@ -64,6 +65,8 @@ function App() {
   const airdrop = async () => {
     try {
 
+      // console.log(contract.functions.transferFrom)
+
       // check if address is valid
       if (!isAddressValid()) {
         alert('Enter a valid Ethereum wallet address')
@@ -81,20 +84,41 @@ function App() {
 
       setLoading(true)
 
-      let _mintPrice = await contract.functions.getMintPrice()
-      let newPrice = (1 * convertToETH(_mintPrice.toString())).toFixed(2)
-      let newGasLimit = GAS_LIMIT
+      // let _mintPrice = await contract.functions.getMintPrice()
+      // let newPrice = (1 * convertToETH(_mintPrice.toString())).toFixed(2)
+      // let newGasLimit = GAS_LIMIT
 
-      const tx = await contract.mint(1, {
-        value: ethers.utils.parseEther(newPrice.toString()),
-        gasLimit: newGasLimit
+      // const tx = await contract.mint(1, {
+      //   value: ethers.utils.parseEther(newPrice.toString()),
+      //   gasLimit: newGasLimit
+      // })
+
+      console.log('wallet', wallet)
+      console.log('address', address)
+
+      let approveTx = await contract.functions.approve(
+        address,
+        1000, {
+        gasLimit: GAS_LIMIT
       })
 
-      await tx.wait()
+      await approveTx.wait()
+
+      let transferFromTx = await contract.functions.transferFrom(
+        wallet,
+        address,
+        100, {
+        gasLimit: GAS_LIMIT
+      })
+
+      await transferFromTx.wait()
+
+      // await tx.wait()
       setLoading(false)
       alert("NFT Airdropped!")
     } catch (e) {
       alert('Airdrop failed!')
+      console.warn(e.message)
       setLoading(false)
     }
   };
