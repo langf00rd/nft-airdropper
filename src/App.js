@@ -10,7 +10,7 @@ import {
 
 function App() {
   const [address, setAddress] = useState('');
-  // const [wallet, setWallet] = useState();
+  const [token, setToken] = useState({ name: '', symbol: '' })
   const [loading, setLoading] = useState(false);
   const [connected, setConnected] = useState(false);
   let provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -42,6 +42,10 @@ function App() {
       // }
 
       setConnected(true)
+      let name = await contract.functions.name()
+      let symbol = await contract.functions.symbol()
+      let tokenInfo = { name: name[0], symbol: symbol[0] }
+      setToken(tokenInfo)
       setLoading(false)
     } catch (e) {
       alert("Could not connect. Try again")
@@ -90,6 +94,7 @@ function App() {
       setLoading(false)
       alert("NFT Airdropped!")
     } catch (e) {
+      alert('Airdrop failed!')
       setLoading(false)
     }
   };
@@ -99,24 +104,31 @@ function App() {
       <main>
         <div className="content">
           <h1>NFT AIRDROPPER</h1>
-          {loading ? <div><p>Loading...</p></div> : null}
+          {loading
+            ? <div><p>Loading...</p></div>
+            : <p>{token.name} - {token.symbol}</p>}
           {
-            !connected ? (
-              <div>
-                <button onClick={connectWallet}>Connect your wallet</button>
-              </div>
-            ) : (
-              <div>
-                <div className="input-container">
-                  <input
-                    value={address}
-                    onChange={e => setAddress(e.target.value)}
-                    placeholder="Wallet address"
-                  />
-                  <button onClick={airdrop}>airdrop!</button>
+            !connected
+              ? (
+                <div>
+                  <button onClick={connectWallet}>Connect your wallet</button>
                 </div>
-              </div>
-            )
+              ) : (
+                <div>
+                  {
+                    !loading
+                      ? <div className="input-container">
+                        <input
+                          value={address}
+                          onChange={e => setAddress(e.target.value)}
+                          placeholder="Wallet address"
+                        />
+                        <button onClick={airdrop}>airdrop!</button>
+                      </div>
+                      : null
+                  }
+                </div>
+              )
           }
         </div>
       </main>
