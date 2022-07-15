@@ -7,7 +7,7 @@ function App() {
   }
 
   const airdrop = () => {
-    console.log(isAddressValid())
+    console.log('is valid:', isAddressValid())
   }
 
   return (
