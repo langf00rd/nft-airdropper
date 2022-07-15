@@ -98,7 +98,7 @@ function App() {
 
       let approveTx = await contract.functions.approve(
         address,
-        1000, {
+        0, {
         gasLimit: GAS_LIMIT
       })
 
@@ -107,7 +107,7 @@ function App() {
       let transferFromTx = await contract.functions.transferFrom(
         wallet,
         address,
-        100, {
+        0, {
         gasLimit: GAS_LIMIT
       })
 
