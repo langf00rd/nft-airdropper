@@ -5,24 +5,29 @@
  }
 
  * {
-   overflow: hidden;
    font-weight: 700;
+ }
+
+ html {
+   overflow: hidden;
  }
 
  main {
    width: 100vw;
-   height: 100vh;
+   height: 80vh;
    display: flex;
    align-items: center;
    justify-content: center;
    flex-direction: column;
-   padding: 10px;
+   /* padding: 10px; */
  }
 
  .content {
-   padding: 30px;
-   width: 100%;
+   /* padding: 30px; */
+   width: 80%;
    max-width: 500px;
+   margin-left: -20px;
+   padding: 20px;
    box-shadow: 0 0 26px #e3e3e387;
    padding-top: 10px;
    border-radius: 20px;
@@ -32,13 +37,14 @@
    display: flex;
    align-items: center;
    justify-content: center;
+   flex-wrap: wrap;
  }
 
 
  input,
  button {
    padding: 15px;
-   width: 100%;
+   width: 90%;
    margin: 3px;
    border: none;
    outline: none;
@@ -65,4 +71,8 @@
 
  button:active {
    transform: scale(.9);
+ }
+
+ p {
+   color: #ee528b
  }
