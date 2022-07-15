@@ -1,8 +1,7 @@
 import "./App.css";
 import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  CHAINS,
   CONTRACT_ABI,
   CONTRACT_ADDRESS,
   GAS_LIMIT,
@@ -10,7 +9,7 @@ import {
 
 function App() {
   const [address, setAddress] = useState('');
-  const [wallet, setWallet] = useState();
+  // const [wallet, setWallet] = useState();
   const [connected, setConnected] = useState(false);
   let provider = new ethers.providers.Web3Provider(window.ethereum)
   let signer = provider.getSigner()
@@ -27,10 +26,10 @@ function App() {
 
   const connectWallet = async () => {
     try {
-      const _wallet = await window.ethereum.request({
+      await window.ethereum.request({
         method: "eth_requestAccounts",
       });
-      setWallet(_wallet[0]);
+      // setWallet(_wallet[0]);
 
       // check if user is owner
       // if (!await isOwner(_wallet[0])) {
@@ -38,6 +37,7 @@ function App() {
       //   alert('You are not the contract owner!')
       //   return
       // }
+
       setConnected(true)
 
     }
