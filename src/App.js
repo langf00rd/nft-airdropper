@@ -13,6 +13,8 @@ function App() {
   const [wallet, setWallet] = useState();
   const [token, setToken] = useState({ name: '', symbol: '' })
   const [loading, setLoading] = useState(false);
+  const [tokensOwned, setTokensOwned] = useState();
+  const [tokensOwnedIds, setTokensOwnedIds] = useState([]);
   const [connected, setConnected] = useState(false);
   let provider = new ethers.providers.Web3Provider(window.ethereum)
   let signer = provider.getSigner()
@@ -30,11 +32,26 @@ function App() {
   const connectWallet = async () => {
     try {
       setLoading(true)
+
       let _wallet = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
 
+      let _tokensOwned = await contract.functions.balanceOf(_wallet[0])
+      // let _tokensOwned = await contract.functions.balanceOf("0x402CcA4ed7d737d901A831849106d142C98FD68f")
+
+      setTokensOwned(Number(_tokensOwned[0]))
       setWallet(_wallet[0]);
+
+      let a = []
+
+      for (let i = 0; i < _tokensOwned; i++) {
+        a.push(i)
+      }
+
+      setTokensOwnedIds(a)
+
+      // setWallet("0x402CcA4ed7d737d901A831849106d142C98FD68f")
       // check if user is owner
       // if (!await isOwner(_wallet[0])) {
       //   setConnected(false)
@@ -42,14 +59,16 @@ function App() {
       //   return
       // }
 
-      setConnected(true)
       let name = await contract.functions.name()
       let symbol = await contract.functions.symbol()
       let tokenInfo = { name: name[0], symbol: symbol[0] }
+
       setToken(tokenInfo)
       setLoading(false)
+      setConnected(true)
     } catch (e) {
       alert("Could not connect. Try again")
+      console.log(e.message)
       setLoading(false)
     }
   };
@@ -65,7 +84,11 @@ function App() {
   const airdrop = async () => {
     try {
 
-      // console.log(contract.functions.transferFrom)
+      // check no of tokens owned
+      if (tokensOwnedIds.length < 1) {
+        alert('You do not have any NFTs to airdrop!')
+        return
+      }
 
       // check if address is valid
       if (!isAddressValid()) {
@@ -73,6 +96,7 @@ function App() {
         return
       }
 
+      // get connected wallet network chain ID
       const { chainId } = await provider.getNetwork()
 
       // check current network
@@ -84,6 +108,10 @@ function App() {
 
       setLoading(true)
 
+      const _tokenToAirdrop = tokensOwnedIds.length
+
+      console.warn('airdropping #', _tokenToAirdrop)
+
       // let _mintPrice = await contract.functions.getMintPrice()
       // let newPrice = (1 * convertToETH(_mintPrice.toString())).toFixed(2)
       // let newGasLimit = GAS_LIMIT
@@ -93,12 +121,13 @@ function App() {
       //   gasLimit: newGasLimit
       // })
 
-      console.log('wallet', wallet)
-      console.log('address', address)
+      // console.log('wallet', wallet)
+      // console.log('address', address)
+      // console.log(await contract.functions)
 
       let approveTx = await contract.functions.approve(
         address,
-        0, {
+        _tokenToAirdrop, {
         gasLimit: GAS_LIMIT
       })
 
@@ -107,7 +136,7 @@ function App() {
       let transferFromTx = await contract.functions.transferFrom(
         wallet,
         address,
-        0, {
+        _tokenToAirdrop, {
         gasLimit: GAS_LIMIT
       })
 
@@ -130,7 +159,7 @@ function App() {
           <h1>NFT AIRDROPPER</h1>
           {loading
             ? <div><p>Loading...</p></div>
-            : <p>{token.name} - {token.symbol}</p>}
+            : <p>{token.name} - {token.symbol} - {tokensOwned ? tokensOwned : '0'} owned</p>}
           {
             !connected
               ? (
